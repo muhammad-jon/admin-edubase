@@ -146,7 +146,7 @@ export default function Quiz() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const lessonData = lessons.find((el) => el.id == lesson);
+    const lessonData = lessons.find((el) => el.id === lesson);
     const normalizedData = {
       cover_image: lessonData.cover_image,
       lesson: getReference({collectionName: 'lessons', id: lessonData.id}),
@@ -160,7 +160,9 @@ export default function Quiz() {
         collectionName: 'quizzes',
         id,
       })
-        .catch(() => {})
+        .catch(() => {
+          return 0;
+        })
         .finally(() => {
           setIsLoading(false);
         });
@@ -168,13 +170,15 @@ export default function Quiz() {
       createDocument(normalizedData, {
         collectionName: 'quizzes',
       })
-        .then((r) => setId(r.id))
-        .catch(() => {})
+        .then((r: {id: React.SetStateAction<string | null>}) => setId(r.id))
+        .catch(() => {
+          return 0;
+        })
         .finally(() => {
           setIsLoading(false);
         });
     }
-    console.log(normalizedData);
+    // console.log(normalizedData);
   };
 
   React.useEffect(() => {
@@ -182,23 +186,29 @@ export default function Quiz() {
       return;
     }
     const urlParams = new URLSearchParams(window.location.search);
+    // eslint-disable-next-line no-shadow
     const id = urlParams.get('id');
     if (id) {
-      getDocument({collectionName: 'quizzes', id}).then((res) => {
-        if (!res) {
-          return;
-        }
-        console.log('res', res);
-        const {lesson, questions, title} = res;
-        setLesson(lesson.id);
-        setTitle(title);
-        setQuestions(questions);
-      });
+      getDocument({collectionName: 'quizzes', id}).then(
+        (res: {lesson: any; questions: any; title: any}) => {
+          if (!res) {
+            return;
+          }
+          // console.log('res', res);
+          // eslint-disable-next-line no-shadow
+          const {lesson, questions, title} = res;
+          setLesson(lesson.id);
+          setTitle(title);
+          setQuestions(questions);
+        },
+      );
     }
-    getDocuments({collectionName: 'lessons'}).then((res) => {
-      console.log('lessons', res);
-      setLessons(res);
-    });
+    getDocuments({collectionName: 'lessons'}).then(
+      (res: React.SetStateAction<never[]>) => {
+        // console.log('lessons', res);
+        setLessons(res);
+      },
+    );
   }, [currentUser]);
 
   const addQuestion = () => {
@@ -222,7 +232,7 @@ export default function Quiz() {
     <form
       onSubmit={handleSubmit}
       className="lesson-fields-container"
-      onInvalidCapture={(e) => console.log('res', e)}
+      onInvalidCapture={(e) => e}
       style={{marginBottom: 32}}>
       <div className="row">
         <div className="input-field col s10">
@@ -231,7 +241,7 @@ export default function Quiz() {
         <div className="input-field col s1">
           {id && (
             <a
-              href={`https://web-teacher.vercel.app/quizzes/${id}`}
+              href={`https://admin-edubase-lexical-playground.vercel.app/quizzes/${id}`}
               target="_blank"
               className="btn waves-effect waves-light">
               {'Tekshirish'}
@@ -269,11 +279,14 @@ export default function Quiz() {
             <option value="" disabled={true} selected={true}>
               Blogni tanlang
             </option>
-            {lessons.map((lesson) => (
-              <option value={lesson.id} key={lesson.id}>
-                {lesson.title}
-              </option>
-            ))}
+            {
+              // eslint-disable-next-line no-shadow
+              lessons.map((lesson) => (
+                <option value={lesson.id} key={lesson.id}>
+                  {lesson.title}
+                </option>
+              ))
+            }
           </select>
         </div>
       </div>

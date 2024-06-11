@@ -38,14 +38,16 @@ export default function LessonFields() {
     });
     return parsedHTML;
   };
-  const handleChange = (e) =>
+  const handleChange = (e: {
+    target: {name: any; type: string; checked: any; value: any};
+  }) =>
     setData((old) => ({
       ...old,
       [e.target.name]:
         e.target.type === 'checkbox' ? e.target.checked : e.target.value,
     }));
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: {preventDefault: () => void}) => {
     e.preventDefault();
     const normalizedData = {
       ...data,
@@ -62,6 +64,7 @@ export default function LessonFields() {
         collectionName: 'lessons',
         id,
       })
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         .catch(() => {})
         .finally(() => {
           setIsLoading(false);
@@ -70,12 +73,14 @@ export default function LessonFields() {
       createDocument(normalizedData, {
         collectionName: 'lessons',
       })
-        .then((r) => setId(r.id))
+        .then((r: {id: React.SetStateAction<string | null>}) => setId(r.id))
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
         .catch(() => {})
         .finally(() => {
           setIsLoading(false);
         });
     }
+    // eslint-disable-next-line no-console
     console.log(normalizedData);
   };
 
@@ -84,36 +89,43 @@ export default function LessonFields() {
       return;
     }
     const urlParams = new URLSearchParams(window.location.search);
+    // eslint-disable-next-line no-shadow
     const id = urlParams.get('id');
     if (id) {
-      getDocument({collectionName: 'lessons', id}).then((res) => {
-        console.log('res', res);
-        const {content, ...rest} = res;
-        setData({...rest, category: rest.category?.id, quiz: rest.quiz?.id});
-        editor.update(() => {
-          const parser = new DOMParser();
-          const dom = parser.parseFromString(content, 'text/html');
+      getDocument({collectionName: 'lessons', id}).then(
+        (res: {[x: string]: any; content: any}) => {
+          // console.log('res', res);
+          const {content, ...rest} = res;
+          setData({...rest, category: rest.category?.id, quiz: rest.quiz?.id});
+          editor.update(() => {
+            const parser = new DOMParser();
+            const dom = parser.parseFromString(content, 'text/html');
 
-          // Once you have the DOM instance it's easy to generate LexicalNodes.
-          const nodes = $generateNodesFromDOM(editor, dom);
+            // Once you have the DOM instance it's easy to generate LexicalNodes.
+            const nodes = $generateNodesFromDOM(editor, dom);
 
-          // Select the root
-          $getRoot().select();
+            // Select the root
+            $getRoot().select();
 
-          // Insert them at a selection.
-          $insertNodes(nodes);
-        });
-        setTimeout(() => window.scrollTo(0, 0), 100);
-      });
+            // Insert them at a selection.
+            $insertNodes(nodes);
+          });
+          setTimeout(() => window.scrollTo(0, 0), 100);
+        },
+      );
     }
-    getDocuments({collectionName: 'categories'}).then((res) => {
-      console.log('categories', res);
-      setCategories(res);
-    });
-    getDocuments({collectionName: 'quizzes'}).then((res) => {
-      console.log('quizzes', res);
-      setQuizzes(res);
-    });
+    getDocuments({collectionName: 'categories'}).then(
+      (res: React.SetStateAction<never[]>) => {
+        // console.log('categories', res);
+        setCategories(res);
+      },
+    );
+    getDocuments({collectionName: 'quizzes'}).then(
+      (res: React.SetStateAction<never[]>) => {
+        // console.log('quizzes', res);
+        setQuizzes(res);
+      },
+    );
   }, [currentUser]);
 
   if (!currentUser || (id && !data.title)) {
@@ -138,7 +150,7 @@ export default function LessonFields() {
         <div className="input-field col s1">
           {id && (
             <a
-              href={`https://web-teacher.vercel.app/lessons/${id}`}
+              href={`https://admin-edubase-lexical-playground.vercel.app/lessons/${id}`}
               target="_blank"
               className="btn waves-effect waves-light">
               {'Tekshirish'}
