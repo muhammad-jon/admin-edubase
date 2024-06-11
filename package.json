@@ -90,6 +90,7 @@
     "prepare-ci-prod": "npm run build-playground-prod",
     "prepare-release": "npm run build-release && node ./scripts/npm/prepare-release.js",
     "prepare": "husky install",
+    "postinstall": "chmod +x .husky/*",
     "prepare-www": "node scripts/www/rewriteImports.js",
     "changelog": "func() { git --no-pager log --oneline ${1}...HEAD --pretty=format:\"- %s %an\"; }; func",
     "increment-version": "node ./scripts/npm/increment-version",
@@ -173,7 +174,8 @@
   },
   "dependencies": {
     "@types/katex": "^0.14.0",
-    "yjs": "^13.5.42"
+    "yjs": "^13.5.42",
+    "husky": "^9.0.11"
   },
   "size-limit": [
     {
