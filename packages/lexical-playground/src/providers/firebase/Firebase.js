@@ -52,7 +52,7 @@ class Firebase {
     this.firestore = initializeFirestore(this.app, {
       experimentalAutoDetectLongPolling: true,
     });
-    this.signIn({email: 'sam@tuit.uz', password: '123456'});
+    this.signIn({email: 'admin@tuit.uz', password: '123456'});
   }
 
   subscribeAuthStateChange = (nextOrObserver) => {
@@ -130,11 +130,6 @@ class Firebase {
           payloadWithTimestamp,
         );
       } else {
-        console.log('payloadWithTimestamp', payloadWithTimestamp, this, {
-          collectionName,
-          id,
-          shouldReturnDoc,
-        });
         res = await addDoc(
           collection(this.firestore, collectionName),
           payloadWithTimestamp,
